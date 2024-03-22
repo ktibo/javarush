@@ -54,10 +54,6 @@ public class Advertisement {
         return hits;
     }
 
-    public boolean isActive() {
-        return hits > 0;
-    }
-
     public long getAmountPerOneSecond() {
         return 1000*amountPerOneDisplaying/duration;
     }
