@@ -1,6 +1,8 @@
 package com.javarush.restaurant.ad;
 
 import com.javarush.restaurant.ConsoleHelper;
+import com.javarush.restaurant.statistic.StatisticManager;
+import com.javarush.restaurant.statistic.event.VideoSelectedEventDataRow;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,6 +37,8 @@ public class AdvertisementManager {
                 return 0;
             }
         });
+
+        StatisticManager.getInstance().register(new VideoSelectedEventDataRow(list, getAmount(list), getDuration(list)));
 
         for (Advertisement advertisement : list) {
             ConsoleHelper.writeMessage(advertisement.toString());

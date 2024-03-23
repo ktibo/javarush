@@ -3,20 +3,45 @@ package com.javarush.restaurant;
 import com.javarush.restaurant.ad.AdvertisementManager;
 import com.javarush.restaurant.ad.NoVideoAvailableException;
 import com.javarush.restaurant.kitchen.Order;
+import com.javarush.restaurant.kitchen.TestOrder;
+import com.javarush.restaurant.statistic.StatisticManager;
+import com.javarush.restaurant.statistic.event.VideoSelectedEventDataRow;
 
 import java.io.IOException;
 import java.util.Observable;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Tablet extends Observable {
+public class Tablet {
 
     private static Logger logger = Logger.getLogger(Tablet.class.getName());
 
     private final int number;
+    private LinkedBlockingQueue<Order> queue;
 
     public Tablet(int number) {
         this.number = number;
+    }
+
+    public Order createTestOrder(){
+        Order order = null;
+
+        try {
+            order = new TestOrder(this);
+            processOrder(order);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Console is unavailable.");
+        } catch (NoVideoAvailableException e) {
+            logger.log(Level.INFO, "No video is available for the order "+order);
+        }
+
+        return order;
+    }
+
+    private void processOrder(Order order) {
+        new AdvertisementManager(order.getTotalCookingTime()*60).processVideos();
+        queue.add(order);
     }
 
     public Order createOrder() {
@@ -25,11 +50,7 @@ public class Tablet extends Observable {
 
         try {
             order = new Order(this);
-            new AdvertisementManager(order.getTotalCookingTime()*60).processVideos();
-            if (!order.isEmpty()) {
-                setChanged();
-                notifyObservers(order);
-            }
+            processOrder(order);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Console is unavailable.");
         } catch (NoVideoAvailableException e) {
@@ -38,6 +59,10 @@ public class Tablet extends Observable {
 
         return order;
 
+    }
+
+    public void setQueue(LinkedBlockingQueue queue) {
+        this.queue = queue;
     }
 
     @Override

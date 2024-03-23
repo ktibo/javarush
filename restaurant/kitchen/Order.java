@@ -11,9 +11,14 @@ public class Order {
     private final Tablet tablet;
     protected List<Dish> dishes;
 
+    protected void initDishes() throws IOException {
+        dishes = ConsoleHelper.getAllDishesForOrder();
+    }
+
     public Order(Tablet tablet) throws IOException {
         this.tablet = tablet;
-        dishes = ConsoleHelper.getAllDishesForOrder();
+        initDishes();
+
         ConsoleHelper.writeMessage(toString());
     }
 
@@ -29,6 +34,14 @@ public class Order {
         }
 
         return duration;
+    }
+
+    public List<Dish> getDishes() {
+        return dishes;
+    }
+
+    public Tablet getTablet() {
+        return tablet;
     }
 
     @Override
